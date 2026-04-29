@@ -15,9 +15,8 @@ public class PaymentService {
 
 	private final ExRateProvider exRateProvider;
 
-	public PaymentService() {
-		// 아직 결합도가 높다
-		this.exRateProvider = new WebApiExRateProvider();
+	public PaymentService(ExRateProvider exRateProvider) {
+		this.exRateProvider = exRateProvider;
 	}
 
 	public Payment prepare(Long orderId, String currency, BigDecimal foreignCurrencyAmount) throws IOException {
