@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 
 import tools.jackson.databind.ObjectMapper;
 
-public class WebApiExRatePaymnetService extends PaymentService{
+public class WebApiExRateProvider implements ExRateProvider {
 
 	@Override
-	BigDecimal getExRate(String currency) throws IOException {
+	public BigDecimal getExRate(String currency) throws IOException {
 			URL url = new URL("https://open.er-api.com/v6/latest/" + currency);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -22,7 +22,6 @@ public class WebApiExRatePaymnetService extends PaymentService{
 
 			ObjectMapper mapper = new ObjectMapper();
 			ExRateData data = mapper.readValue(response, ExRateData.class);
-			BigDecimal exRate = data.rates().get("KRW");
-			return exRate;
+			return data.rates().get("KRW");
 	}
 }

@@ -11,15 +11,23 @@ import java.util.stream.Collectors;
 
 import tools.jackson.databind.ObjectMapper;
 
-public abstract class PaymentService {
+public class PaymentService {
+
+	private final ExRateProvider exRateProvider;
+
+	public PaymentService() {
+		// 아직 결합도가 높다
+		this.exRateProvider = new WebApiExRateProvider();
+	}
 
 	public Payment prepare(Long orderId, String currency, BigDecimal foreignCurrencyAmount) throws IOException {
-		BigDecimal exRate = getExRate(currency);
+
+		// 환율을 가져오는 정책이나 방식이 변경되어도 외부에서 변경 가능
+		BigDecimal exRate = exRateProvider.getExRate(currency);
 		BigDecimal convertedAmount = foreignCurrencyAmount.multiply(exRate);
 		LocalDateTime validUntil = LocalDateTime.now().plusMinutes(30);
 
 		return new Payment(orderId, currency,	foreignCurrencyAmount, exRate, convertedAmount, validUntil);
 	}
 
-	abstract BigDecimal getExRate(String currency) throws IOException;
 }
