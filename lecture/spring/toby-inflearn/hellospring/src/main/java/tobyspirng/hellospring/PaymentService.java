@@ -9,6 +9,8 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Component;
+
 import tools.jackson.databind.ObjectMapper;
 
 public class PaymentService {
