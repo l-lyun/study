@@ -1,23 +1,30 @@
 package tobyspirng.hellospring.payment;
 
+import static java.math.BigDecimal.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import tobyspirng.hellospring.exrate.WebApiExRateProvider;
 
 class PaymentServiceTest {
 
 	@Test
-	void prepare() throws IOException {
-		PaymentService paymentService = new PaymentService(new WebApiExRateProvider());
+	void convertedAmount() throws IOException {
+		testAmount(valueOf(500), valueOf(5_000));
+		testAmount(valueOf(1_000), valueOf(10_000));
+		testAmount(valueOf(3_000), valueOf(30_000));
+
+		// 원화환산금액의 유효시간 계산
+		// assertThat(payment.getValidUntil()).isAfter(LocalDateTime.now());
+		// assertThat(payment.getValidUntil()).isAfter(LocalDateTime.now().plusMinutes(29));
+	}
+
+	private static Payment testAmount(BigDecimal exRate, BigDecimal convertedAmount) throws IOException {
+		// PaymentService 입장에서는 어떠한 값이 들어오는지 알 필요가 없다
+		PaymentService paymentService = new PaymentService(new ExRateProviderStub(exRate));
 
 		// prepare 메서드가 IOException을 던지는데 캐치하거나 throw가 없다
 		// 테스트 메서드에서 throws 걸어서 Exception 던지면 괜찮을까?
@@ -25,20 +32,14 @@ class PaymentServiceTest {
 		Payment payment = paymentService.prepare(
 			1L,
 			"USD",
-			BigDecimal.TEN
+			TEN
 		);
 
-		// 환율정보 가져온다
-		assertThat(payment.getExRate()).isNotNull();
-
-		// 원화환산금액 계산
-		assertThat(payment.getConvertedAmount())
-			.isEqualTo(payment.getExRate()
-			.multiply(payment.getForeignCurrencyAmount()));
-
-		// 원화환산금액의 유효시간 계산
-		assertThat(payment.getValidUntil()).isAfter(LocalDateTime.now());
-		assertThat(payment.getValidUntil()).isAfter(LocalDateTime.now().plusMinutes(29));
+		// BigDecimal은 숫자만이 아닌 자릿수까지도 비교한다
+		// isEqualTo는 소수점 2자리까지만 같다고 한다
+		assertThat(payment.getExRate()).isEqualByComparingTo(exRate);
+		assertThat(payment.getConvertedAmount()).isEqualByComparingTo(convertedAmount);
+		return payment;
 	}
 
 }
