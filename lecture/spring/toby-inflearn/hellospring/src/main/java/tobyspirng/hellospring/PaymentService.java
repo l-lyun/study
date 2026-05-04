@@ -9,49 +9,26 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Component;
+
 import tools.jackson.databind.ObjectMapper;
 
 public class PaymentService {
 
-	public Payment prepare(Long orderId, String currency, BigDecimal foreignCurrencyAmount) throws IOException {
-		// 환율 가져오기
-		// https://open.er-api.com/v6/latest/USD
-		URL url = new URL("https://open.er-api.com/v6/latest/" + currency);
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-		BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-		String response = br.lines().collect(Collectors.joining());
+	private final ExRateProvider exRateProvider;
 
-		ObjectMapper mapper = new ObjectMapper();
-		ExRateData data = mapper.readValue(
-			response,
-			ExRateData.class
-		);
-
-		BigDecimal exRate = data.rates().get("KRW");
-
-		System.out.println();
-		br.close();
-
-		// 금액 계산
-		BigDecimal convertedAmount = foreignCurrencyAmount.multiply(exRate);
-
-		// 유효 시간 계산
-		LocalDateTime validUntil = LocalDateTime.now().plusMinutes(30);
-
-		return new Payment(
-			orderId,
-			currency,
-			foreignCurrencyAmount,
-			exRate,
-			convertedAmount,
-			validUntil
-		);
+	public PaymentService(ExRateProvider exRateProvider) {
+		this.exRateProvider = exRateProvider;
 	}
 
-	public static void main(String[] args) throws IOException {
-		PaymentService paymentService = new PaymentService();
-		Payment payment = paymentService.prepare(100L, "USD", BigDecimal.valueOf(50.7));
-		System.out.println(payment);
+	public Payment prepare(Long orderId, String currency, BigDecimal foreignCurrencyAmount) throws IOException {
+
+		// 환율을 가져오는 정책이나 방식이 변경되어도 외부에서 변경 가능
+		BigDecimal exRate = exRateProvider.getExRate(currency);
+		BigDecimal convertedAmount = foreignCurrencyAmount.multiply(exRate);
+		LocalDateTime validUntil = LocalDateTime.now().plusMinutes(30);
+
+		return new Payment(orderId, currency,	foreignCurrencyAmount, exRate, convertedAmount, validUntil);
 	}
 
 }
