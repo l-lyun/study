@@ -1,8 +1,12 @@
 package tobyspirng.hellospring;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+
+import tobyspirng.hellospring.payment.PaymentService;
+import tobyspirng.hellospring.exrate.CachedExRateProvider;
+import tobyspirng.hellospring.payment.ExRateProvider;
+import tobyspirng.hellospring.exrate.WebApiExRateProvider;
 
 @Configuration
 public class ObjectFactory {

@@ -1,4 +1,4 @@
-package tobyspirng.hellospring;
+package tobyspirng.hellospring.exrate;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,8 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Component;
-
+import tobyspirng.hellospring.payment.ExRateProvider;
 import tools.jackson.databind.ObjectMapper;
 
 public class WebApiExRateProvider implements ExRateProvider {
