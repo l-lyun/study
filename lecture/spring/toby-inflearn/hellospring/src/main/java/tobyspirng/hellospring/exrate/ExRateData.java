@@ -1,4 +1,4 @@
-package tobyspirng.hellospring;
+package tobyspirng.hellospring.exrate;
 
 import java.math.BigDecimal;
 import java.util.Map;
