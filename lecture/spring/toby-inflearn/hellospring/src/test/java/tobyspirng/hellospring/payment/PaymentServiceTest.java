@@ -5,26 +5,49 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class PaymentServiceTest {
 
-	@Test
-	void convertedAmount() throws IOException {
-		testAmount(valueOf(500), valueOf(5_000));
-		testAmount(valueOf(1_000), valueOf(10_000));
-		testAmount(valueOf(3_000), valueOf(30_000));
+	Clock clock;
 
-		// 원화환산금액의 유효시간 계산
-		// assertThat(payment.getValidUntil()).isAfter(LocalDateTime.now());
-		// assertThat(payment.getValidUntil()).isAfter(LocalDateTime.now().plusMinutes(29));
+	@BeforeEach
+	void beforeEach() {
+		this.clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
 	}
 
-	private static Payment testAmount(BigDecimal exRate, BigDecimal convertedAmount) throws IOException {
+
+	@Test
+	void convertedAmount() throws IOException {
+		testAmount(valueOf(500), valueOf(5_000), this.clock);
+		testAmount(valueOf(1_000), valueOf(10_000), this.clock);
+		testAmount(valueOf(3_000), valueOf(30_000), this.clock);
+	}
+
+	@Test
+	void validUntil() throws IOException {
+		PaymentService paymentService = new PaymentService(new ExRateProviderStub(valueOf(1_000)), clock);
+
+		Payment payment = paymentService.prepare(1L, "USD", BigDecimal.TEN);
+
+		// valid until이 prepare() 30분 뒤로 설정됐는가?
+		LocalDateTime now = LocalDateTime.now(this.clock);
+		LocalDateTime expectedValidUntil = now.plusMinutes(30);
+
+		Assertions.assertThat(payment.getValidUntil()).isEqualTo(expectedValidUntil);
+
+	}
+
+	private static Payment testAmount(BigDecimal exRate, BigDecimal convertedAmount, Clock clock) throws IOException {
 		// PaymentService 입장에서는 어떠한 값이 들어오는지 알 필요가 없다
-		PaymentService paymentService = new PaymentService(new ExRateProviderStub(exRate));
+		PaymentService paymentService = new PaymentService(new ExRateProviderStub(exRate), clock);
 
 		// prepare 메서드가 IOException을 던지는데 캐치하거나 throw가 없다
 		// 테스트 메서드에서 throws 걸어서 Exception 던지면 괜찮을까?

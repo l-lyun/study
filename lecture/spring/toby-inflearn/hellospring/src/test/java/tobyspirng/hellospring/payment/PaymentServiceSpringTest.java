@@ -5,21 +5,21 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.LocalDateTime;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import tobyspirng.hellospring.ObjectFactory;
-import tobyspirng.hellospring.TestObjectFactory;
+import tobyspirng.hellospring.TestPaymentConfig;
 
 @ExtendWith(SpringExtension.class)
 // 이 테스트가 실행될 때 클래스의 구성정보를 읽어 스프링의 구성정보를 읽어 컨테이너 생성
-@ContextConfiguration(classes = TestObjectFactory.class)
+@ContextConfiguration(classes = TestPaymentConfig.class)
 class PaymentServiceSpringTest {
 
 	// 내가 갖고 있는 오브젝트 중에 이 타입을 가져와서 대체
@@ -33,6 +33,8 @@ class PaymentServiceSpringTest {
 	// 테스트용으로 사용할 때는 인터페이스가 아니라 클래스 직접 호출해도 좋다
 	@Autowired
 	ExRateProviderStub exRateProviderStub;
+	@Autowired
+	Clock clock;
 
 
 	@Test
@@ -53,6 +55,20 @@ class PaymentServiceSpringTest {
 		assertThat(payment2.getConvertedAmount()).isEqualByComparingTo(valueOf(10_000));
 
 	}
+
+	@Test
+	void validUntil() throws IOException {
+
+		Payment payment = paymentService.prepare(1L, "USD", BigDecimal.TEN);
+
+		// valid until이 prepare() 30분 뒤로 설정됐는가?
+		LocalDateTime now = LocalDateTime.now(this.clock);
+		LocalDateTime expectedValidUntil = now.plusMinutes(30);
+
+		Assertions.assertThat(payment.getValidUntil()).isEqualTo(expectedValidUntil);
+
+	}
+
 	//
 	// private static Payment testAmount(BigDecimal exRate, BigDecimal convertedAmount) throws IOException {
 	//
