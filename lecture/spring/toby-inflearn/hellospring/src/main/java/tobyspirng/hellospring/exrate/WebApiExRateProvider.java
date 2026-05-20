@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.stream.Collectors;
 
 import org.springframework.boot.json.JsonParseException;
@@ -30,24 +29,31 @@ public class WebApiExRateProvider implements ExRateProvider {
 		}
 		String response;
 		try {
-				HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
-
-					try(BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-
-						response = br.lines().collect(Collectors.joining());
-					}
-			} catch (IOException e) {
+			response = executeApi(uri);
+		} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 
 			try {
-				ObjectMapper mapper = new ObjectMapper();
-				ExRateData data = mapper.readValue(response, ExRateData.class);
-				return data.rates().get("KRW");
-
+				return parseExRate(response);
 			} catch (JsonParseException e) {
 				throw new RuntimeException(e);
 			}
 
+	}
+
+	private static BigDecimal parseExRate(String response) {
+		ObjectMapper mapper = new ObjectMapper();
+		ExRateData data = mapper.readValue(response, ExRateData.class);
+		return data.rates().get("KRW");
+	}
+
+	private static String executeApi(URI uri) throws IOException {
+		String response;
+		HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+		try(BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+				response = br.lines().collect(Collectors.joining());
+			}
+		return response;
 	}
 }
