@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.boot.json.JsonParseException;
 
+import tobyspirng.hellospring.api.SimpleApiExecutor;
 import tobyspirng.hellospring.payment.ExRateProvider;
 import tools.jackson.databind.ObjectMapper;
 
@@ -33,7 +34,7 @@ public class WebApiExRateProvider implements ExRateProvider {
 		}
 		String response;
 		try {
-			response = executeApi(uri);
+			response = new SimpleApiExecutor().execute(uri);
 		} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -51,12 +52,4 @@ public class WebApiExRateProvider implements ExRateProvider {
 		return data.rates().get("KRW");
 	}
 
-	private static String executeApi(URI uri) throws IOException {
-		String response;
-		HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
-		try(BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-				response = br.lines().collect(Collectors.joining());
-			}
-		return response;
-	}
 }
