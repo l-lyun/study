@@ -25,14 +25,14 @@ class PaymentServiceTest {
 
 
 	@Test
-	void convertedAmount() throws IOException {
+	void convertedAmount() {
 		testAmount(valueOf(500), valueOf(5_000), this.clock);
 		testAmount(valueOf(1_000), valueOf(10_000), this.clock);
 		testAmount(valueOf(3_000), valueOf(30_000), this.clock);
 	}
 
 	@Test
-	void validUntil() throws IOException {
+	void validUntil() {
 		PaymentService paymentService = new PaymentService(new ExRateProviderStub(valueOf(1_000)), clock);
 
 		Payment payment = paymentService.prepare(1L, "USD", BigDecimal.TEN);
@@ -45,7 +45,7 @@ class PaymentServiceTest {
 
 	}
 
-	private static Payment testAmount(BigDecimal exRate, BigDecimal convertedAmount, Clock clock) throws IOException {
+	private static Payment testAmount(BigDecimal exRate, BigDecimal convertedAmount, Clock clock) {
 		// PaymentService 입장에서는 어떠한 값이 들어오는지 알 필요가 없다
 		PaymentService paymentService = new PaymentService(new ExRateProviderStub(exRate), clock);
 

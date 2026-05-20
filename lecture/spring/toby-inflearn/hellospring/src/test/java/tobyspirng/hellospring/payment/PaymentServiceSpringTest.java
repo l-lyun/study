@@ -38,7 +38,7 @@ class PaymentServiceSpringTest {
 
 
 	@Test
-	void convertedAmount() throws IOException {
+	void convertedAmount()  {
 		// PaymentService paymentService = beanFactory.getBean(PaymentService.class);
 
 		// exRate: 1000
@@ -57,7 +57,7 @@ class PaymentServiceSpringTest {
 	}
 
 	@Test
-	void validUntil() throws IOException {
+	void validUntil()  {
 
 		Payment payment = paymentService.prepare(1L, "USD", BigDecimal.TEN);
 
