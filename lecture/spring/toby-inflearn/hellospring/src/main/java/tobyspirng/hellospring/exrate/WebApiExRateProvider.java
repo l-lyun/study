@@ -1,56 +1,31 @@
 package tobyspirng.hellospring.exrate;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.stream.Collectors;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
-import org.springframework.boot.json.JsonParseException;
-
-import tobyspirng.hellospring.api.ApiExecutor;
+import tobyspirng.hellospring.api.ApiTemplate;
 import tobyspirng.hellospring.api.ErApiExRateExtractor;
-import tobyspirng.hellospring.api.ExRateExtractor;
+import tobyspirng.hellospring.api.HttpClientApiExecutor;
 import tobyspirng.hellospring.api.SimpleApiExecutor;
 import tobyspirng.hellospring.payment.ExRateProvider;
-import tools.jackson.databind.ObjectMapper;
-
 
 public class WebApiExRateProvider implements ExRateProvider {
+
+	// 여러 사용자가 멀티스레드 환경에서 동시에 사용해도 상태가 없기 때문에
+	// 인스턴스가 만들어질 때 재사용하도록 유도
+	ApiTemplate apiTemplate = new ApiTemplate();
 
 	// 클라이언트 -> 콜백 -> 템플릿
 	// 클라이언트가 콜백을 만들어서 템플릿을 실행
 	@Override
 	public BigDecimal getExRate(String currency) {
+
 		String url = "https://open.er-api.com/v6/latest/" + currency;
 		// 콜백: new SimpleApiExecutor()
 		// 변하는 속성을 가진 코드는 콜백으로 메서드 파라미터 형태로 전달
-		return runApiForExRate(url, new SimpleApiExecutor(), new ErApiExRateExtractor());
+		return apiTemplate.getExRate(url, new HttpClientApiExecutor(), new ErApiExRateExtractor());
 	}
 
-	// 템플릿: 내부 기능 실행
-	private static BigDecimal runApiForExRate(String url, ApiExecutor apiExecutor, ExRateExtractor exRateExtractor) {
-		URI uri;
-		try {
-			uri = new URI(url);
-		} catch (URISyntaxException e) {
-			// 기존에 발생했던 checked exception을 종류만 바꿔서 런타임 익셉션으로 throw
-			throw new RuntimeException(e);
-		}
-		String response;
-		try {
-			response = apiExecutor.execute(uri);
-		} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-
-		try {
-			return exRateExtractor.extractExRate(response);
-		} catch (JsonParseException e) {
-			throw new RuntimeException(e);
-		}
-	}
 }
