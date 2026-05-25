@@ -4,7 +4,13 @@ import java.time.Clock;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
 
+import tobyspirng.hellospring.api.ApiTemplate;
+import tobyspirng.hellospring.api.ErApiExRateExtractor;
+import tobyspirng.hellospring.api.SimpleApiExecutor;
+import tobyspirng.hellospring.exrate.RestTemplateExRateProvider;
 import tobyspirng.hellospring.payment.PaymentService;
 import tobyspirng.hellospring.exrate.CachedExRateProvider;
 import tobyspirng.hellospring.payment.ExRateProvider;
@@ -17,7 +23,7 @@ public class PaymentConfig {
 	// 어떠한 의존관계가 맺어져있는지 다 들어가있다.
 	@Bean
 	public PaymentService paymentService() {
-		return new PaymentService(cachedExRateProvider(), clock());
+		return new PaymentService(exRateProvider(), clock());
 	}
 
 	@Bean
@@ -25,9 +31,15 @@ public class PaymentConfig {
 		return new CachedExRateProvider(exRateProvider());
 	}
 
+	// ApiTemplate도 하나의 빈으로 등록
+	@Bean
+	public RestTemplate restTemplate() {
+		return new RestTemplate(new JdkClientHttpRequestFactory());
+	}
+
 	@Bean
 	public ExRateProvider exRateProvider() {
-		return new WebApiExRateProvider();
+		return new RestTemplateExRateProvider(restTemplate());
 	}
 
 	@Bean

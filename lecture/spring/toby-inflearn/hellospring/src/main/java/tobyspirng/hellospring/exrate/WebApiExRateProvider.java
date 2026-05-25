@@ -1,30 +1,35 @@
 package tobyspirng.hellospring.exrate;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.stream.Collectors;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
+import tobyspirng.hellospring.api.ApiTemplate;
+import tobyspirng.hellospring.api.ErApiExRateExtractor;
+import tobyspirng.hellospring.api.HttpClientApiExecutor;
+import tobyspirng.hellospring.api.SimpleApiExecutor;
 import tobyspirng.hellospring.payment.ExRateProvider;
-import tools.jackson.databind.ObjectMapper;
 
 public class WebApiExRateProvider implements ExRateProvider {
 
-	@Override
-	public BigDecimal getExRate(String currency) throws IOException {
-			URL url = new URL("https://open.er-api.com/v6/latest/" + currency);
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			String response = br.lines().collect(Collectors.joining());
-			br.close();
+	// 여러 사용자가 멀티스레드 환경에서 동시에 사용해도 상태가 없기 때문에
+	// 인스턴스가 만들어질 때 재사용하도록 유도
+	private final ApiTemplate apiTemplate;
 
-			ObjectMapper mapper = new ObjectMapper();
-			ExRateData data = mapper.readValue(response, ExRateData.class);
-
-			System.out.println("API ExRate: " + data.rates().get("KRW"));
-			return data.rates().get("KRW");
+	public WebApiExRateProvider(ApiTemplate apiTemplate) {
+		this.apiTemplate = apiTemplate;
 	}
+
+	// 클라이언트 -> 콜백 -> 템플릿
+	// 클라이언트가 콜백을 만들어서 템플릿을 실행
+	@Override
+	public BigDecimal getExRate(String currency) {
+
+		String url = "https://open.er-api.com/v6/latest/" + currency;
+		// 콜백: new SimpleApiExecutor()
+		// 변하는 속성을 가진 코드는 콜백으로 메서드 파라미터 형태로 전달
+		return apiTemplate.getForExRate(url);
+	}
+
 }
