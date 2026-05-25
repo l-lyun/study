@@ -4,10 +4,13 @@ import java.time.Clock;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
 
 import tobyspirng.hellospring.api.ApiTemplate;
 import tobyspirng.hellospring.api.ErApiExRateExtractor;
 import tobyspirng.hellospring.api.SimpleApiExecutor;
+import tobyspirng.hellospring.exrate.RestTemplateExRateProvider;
 import tobyspirng.hellospring.payment.PaymentService;
 import tobyspirng.hellospring.exrate.CachedExRateProvider;
 import tobyspirng.hellospring.payment.ExRateProvider;
@@ -30,13 +33,13 @@ public class PaymentConfig {
 
 	// ApiTemplate도 하나의 빈으로 등록
 	@Bean
-	public ApiTemplate apiTemplate() {
-		return new ApiTemplate(new SimpleApiExecutor(), new ErApiExRateExtractor());
+	public RestTemplate restTemplate() {
+		return new RestTemplate(new JdkClientHttpRequestFactory());
 	}
 
 	@Bean
 	public ExRateProvider exRateProvider() {
-		return new WebApiExRateProvider(apiTemplate());
+		return new RestTemplateExRateProvider(restTemplate());
 	}
 
 	@Bean
