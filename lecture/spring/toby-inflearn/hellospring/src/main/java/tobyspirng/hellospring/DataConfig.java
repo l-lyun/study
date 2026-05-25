@@ -9,6 +9,9 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
+import jakarta.persistence.EntityManagerFactory;
+import tobyspirng.hellospring.data.OrderRepository;
+
 public class DataConfig {
 
 	// data source
@@ -30,5 +33,11 @@ public class DataConfig {
 		}});
 
 		return emf;
+	}
+
+	@Bean
+	// 스프링 컨테이너에서 Bean 메서드에 의해 생성되는 EntityManagerFactory를 가져온다
+	public OrderRepository orderRepository(EntityManagerFactory emf) {
+		return new OrderRepository(emf);
 	}
 }
