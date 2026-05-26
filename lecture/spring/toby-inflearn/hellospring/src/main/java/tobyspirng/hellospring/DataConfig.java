@@ -13,7 +13,6 @@ import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
 import jakarta.persistence.EntityManagerFactory;
-import tobyspirng.hellospring.data.OrderRepository;
 
 public class DataConfig {
 

@@ -6,8 +6,6 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import tobyspirng.hellospring.data.OrderRepository;
-
 @Service
 public class OrderService {
 
