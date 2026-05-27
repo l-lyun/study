@@ -1,12 +1,13 @@
 package tobyspirng.hellospring;
 
+import javax.sql.DataSource;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import tobyspirng.hellospring.data.JpaOrderRepository;
+import tobyspirng.hellospring.data.JdbcOrderRepository;
 import tobyspirng.hellospring.order.OrderRepository;
 import tobyspirng.hellospring.order.OrderService;
 
@@ -16,13 +17,16 @@ import tobyspirng.hellospring.order.OrderService;
 public class OrderConfig {
 
 	@Bean
-	public OrderRepository orderRepository() {
-		return new JpaOrderRepository();
+	public OrderRepository orderRepository(DataSource dataSource) {
+		return new JdbcOrderRepository(dataSource);
 	}
 
 	@Bean
-	public OrderService orderService(PlatformTransactionManager transactionManager) {
-		return new OrderService(orderRepository(), transactionManager);
+	public OrderService orderService(
+		PlatformTransactionManager transactionManager,
+		OrderRepository orderRepository
+		 ) {
+		return new OrderService(orderRepository, transactionManager);
 	}
 
 }
