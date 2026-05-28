@@ -10,6 +10,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import tobyspirng.hellospring.data.JdbcOrderRepository;
 import tobyspirng.hellospring.order.OrderRepository;
 import tobyspirng.hellospring.order.OrderService;
+import tobyspirng.hellospring.order.OrderServiceImpl;
+import tobyspirng.hellospring.order.OrderServiceTxProxy;
 
 @Configuration
 // OrderConfig를 로딩할 때 DataConfig에 있는 모든 빈 설정까지 가져올 수 있음
@@ -26,7 +28,10 @@ public class OrderConfig {
 		PlatformTransactionManager transactionManager,
 		OrderRepository orderRepository
 		 ) {
-		return new OrderService(orderRepository, transactionManager);
+		return new OrderServiceTxProxy(
+			new OrderServiceImpl(orderRepository),
+			transactionManager
+		);
 	}
 
 }
