@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: tobyspring
+  datasource:
+    url: jdbc:mysql://localhost:3306/tobyspring?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: toby
+    password: toby
+    driver-class-name: com.mysql.cj.jdbc.Driver
