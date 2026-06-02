@@ -3,6 +3,7 @@ package tobyspring;
 import java.sql.SQLException;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import tobyspring.user.dao.DaoFactory;
 import tobyspring.user.dao.IndependentUserDao;
@@ -21,9 +22,14 @@ public class UserDaoTest {
 	// }
 
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
-		IndependentUserDao userDao = new DaoFactory().userDao();
+
+		// 아직까지는 기존에 DaoFactory가 더 깔끔한 것 같음
+		// 기능적으로도 차이가 없다.
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+		IndependentUserDao userDao = context.getBean("userDao", IndependentUserDao.class);
+
 		User user = new User();
-		user.setId("wsadffdip");
+		user.setId("saddfdip");
 		user.setName("김도현");
 		user.setPassword("123456");
 
