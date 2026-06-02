@@ -10,7 +10,11 @@ import tobyspring.user.domain.User;
 
 public class IndependentUserDao {
 
-	private ConnectionMaker connectionMaker = new SimpleConnectionMaker();
+	private final ConnectionMaker connectionMaker;
+
+	public IndependentUserDao(ConnectionMaker connectionMaker) {
+		this.connectionMaker = connectionMaker;
+	}
 
 	public void add(User user) throws ClassNotFoundException, SQLException {
 		Connection c = connectionMaker.makeNewConnection();
