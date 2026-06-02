@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import tobyspring.user.dao.DaoFactory;
 import tobyspring.user.dao.IndependentUserDao;
 import tobyspring.user.dao.SimpleConnectionMaker;
 import tobyspring.user.dao.UserDao;
@@ -20,9 +21,9 @@ public class UserDaoTest {
 	// }
 
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
-		IndependentUserDao userDao = new IndependentUserDao(new SimpleConnectionMaker());
+		IndependentUserDao userDao = new DaoFactory().userDao();
 		User user = new User();
-		user.setId("wsadfdhfip");
+		user.setId("wsadffdip");
 		user.setName("김도현");
 		user.setPassword("123456");
 
