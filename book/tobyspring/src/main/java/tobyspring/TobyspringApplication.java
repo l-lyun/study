@@ -21,7 +21,7 @@ public class TobyspringApplication {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
 		UserDao userDao = new UserDao();
 		User user = new User();
-		user.setId("whiteship");
+		user.setId("whitesdhip");
 		user.setName("김도현");
 		user.setPassword("123456");
 
