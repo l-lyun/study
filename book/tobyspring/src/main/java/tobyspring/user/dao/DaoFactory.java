@@ -21,6 +21,11 @@ public class DaoFactory {
 	@Bean
 	public ConnectionMaker connectionMaker() {
 		// 분리하여 중복을 제거한 ConnectionMaker 타입 오브젝트 생성 코드
-		return new SimpleConnectionMaker();
+		return new CountingConnectionMaker(realConnectionMaker());
+	}
+
+	@Bean
+	public ConnectionMaker realConnectionMaker() {
+		return new CountingConnectionMaker(new SimpleConnectionMaker());
 	}
 }

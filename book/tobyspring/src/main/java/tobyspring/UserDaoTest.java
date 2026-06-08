@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import tobyspring.user.dao.CountingConnectionMaker;
 import tobyspring.user.dao.DaoFactory;
 import tobyspring.user.dao.IndependentUserDao;
 import tobyspring.user.dao.SimpleConnectionMaker;
@@ -29,7 +30,7 @@ public class UserDaoTest {
 		IndependentUserDao userDao = context.getBean("userDao", IndependentUserDao.class);
 
 		User user = new User();
-		user.setId("saddfdip");
+		user.setId("saddip");
 		user.setName("김도현");
 		user.setPassword("123456");
 
@@ -39,5 +40,17 @@ public class UserDaoTest {
 
 		User user2 = userDao.get(user.getId());
 		System.out.println("user2 = " + user2.getName());
+
+		CountingConnectionMaker ccm = context.getBean(
+			"connectionMaker",
+			CountingConnectionMaker.class
+		);
+
+
+		User user3 = userDao.get(user.getId());
+		System.out.println("user2 = " + user3.getName());
+
+		System.out.println("ccm.getCount() = " + ccm.getCount());
+
 	}
 }
