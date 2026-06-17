@@ -1,0 +1,56 @@
+package tobyspring;
+
+import java.sql.SQLException;
+
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import tobyspring.user.dao.CountingConnectionMaker;
+import tobyspring.user.dao.DaoFactory;
+import tobyspring.user.dao.IndependentUserDao;
+import tobyspring.user.dao.SimpleConnectionMaker;
+import tobyspring.user.dao.UserDao;
+import tobyspring.user.domain.User;
+
+@SpringBootApplication
+public class UserDaoTest {
+	//
+	// public static void main(String[] args) {
+	// 	SpringApplication.run(
+	// 		TobyspringApplication.class,
+	// 		args
+	// 	);
+	// }
+
+	public static void main(String[] args) throws ClassNotFoundException, SQLException {
+
+		// 아직까지는 기존에 DaoFactory가 더 깔끔한 것 같음
+		// 기능적으로도 차이가 없다.
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+		IndependentUserDao userDao = context.getBean("userDao", IndependentUserDao.class);
+
+		User user = new User();
+		user.setId("saddip");
+		user.setName("김도현");
+		user.setPassword("123456");
+
+		userDao.add(user);
+
+		System.out.println(user.getId() + " 등록 성공");
+
+		User user2 = userDao.get(user.getId());
+		System.out.println("user2 = " + user2.getName());
+
+		CountingConnectionMaker ccm = context.getBean(
+			"connectionMaker",
+			CountingConnectionMaker.class
+		);
+
+
+		User user3 = userDao.get(user.getId());
+		System.out.println("user2 = " + user3.getName());
+
+		System.out.println("ccm.getCount() = " + ccm.getCount());
+
+	}
+}
