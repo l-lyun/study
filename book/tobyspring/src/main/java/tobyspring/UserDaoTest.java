@@ -12,7 +12,7 @@ import tobyspring.user.dao.SimpleConnectionMaker;
 import tobyspring.user.dao.UserDao;
 import tobyspring.user.domain.User;
 
-@SpringBootApplication
+
 public class UserDaoTest {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
 
