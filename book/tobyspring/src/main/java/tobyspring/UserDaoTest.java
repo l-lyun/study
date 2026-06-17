@@ -14,14 +14,6 @@ import tobyspring.user.domain.User;
 
 @SpringBootApplication
 public class UserDaoTest {
-	//
-	// public static void main(String[] args) {
-	// 	SpringApplication.run(
-	// 		TobyspringApplication.class,
-	// 		args
-	// 	);
-	// }
-
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
 
 		// 아직까지는 기존에 DaoFactory가 더 깔끔한 것 같음
@@ -39,18 +31,18 @@ public class UserDaoTest {
 		System.out.println(user.getId() + " 등록 성공");
 
 		User user2 = userDao.get(user.getId());
-		System.out.println("user2 = " + user2.getName());
+		if(!user.getName().equals(user2.getName())) {
+			System.out.println("테스트 실패 (name)");
+		}
+		else if (!user.getPassword().equals(user2.getPassword())) {
+			System.out.println("테스트 (password)");
+		}
+		else {
+			System.out.println("조회 테스트 성공");
+		}
 
-		CountingConnectionMaker ccm = context.getBean(
-			"connectionMaker",
-			CountingConnectionMaker.class
-		);
 
 
-		User user3 = userDao.get(user.getId());
-		System.out.println("user2 = " + user3.getName());
-
-		System.out.println("ccm.getCount() = " + ccm.getCount());
 
 	}
 }
