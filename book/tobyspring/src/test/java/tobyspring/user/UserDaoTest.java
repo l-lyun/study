@@ -1,5 +1,7 @@
 package tobyspring.user;
 
+import static org.assertj.core.api.Assertions.*;
+
 import java.sql.SQLException;
 
 import org.assertj.core.api.Assertions;
@@ -17,16 +19,20 @@ public class UserDaoTest {
 		ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
 		IndependentUserDao userDao = context.getBean("userDao", IndependentUserDao.class);
 
+		userDao.deleteAll();
+		assertThat(userDao.getCount()).isEqualTo(0);
+
 		User user = new User();
 		user.setId("asdf");
 		user.setName("김도현");
 		user.setPassword("asdf");
 
 		userDao.add(user);
+		assertThat(userDao.getCount()).isEqualTo(1);
 		User user2 = userDao.get(user.getId());
 
-		Assertions.assertThat(user.getId()).isEqualTo(user2.getId());
-		Assertions.assertThat(user.getName()).isEqualTo(user2.getName());
-		Assertions.assertThat(user.getPassword()).isEqualTo(user2.getPassword());
+		assertThat(user.getId()).isEqualTo(user2.getId());
+		assertThat(user.getName()).isEqualTo(user2.getName());
+		assertThat(user.getPassword()).isEqualTo(user2.getPassword());
 	}
 }
