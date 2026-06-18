@@ -22,8 +22,6 @@ import tobyspring.user.domain.User;
 public class UserDaoTest {
 
 	@Autowired
-	private ApplicationContext context;
-
 	private IndependentUserDao userDao;
 
 	private User user1;
@@ -32,16 +30,9 @@ public class UserDaoTest {
 
 	@BeforeEach
 	public void setup() {
-
-		System.out.println(this.context);
-		System.out.println(this);
-
-		this.userDao = this.context.getBean("userDao", IndependentUserDao.class);
-
 		this.user1 = new User("aa", "김김", "spring1");
 		this.user2 = new User("bb", "이이", "spring2");
 		this.user3 = new User("cc", "박박", "spring3");
-
 	}
 
 	@Test
