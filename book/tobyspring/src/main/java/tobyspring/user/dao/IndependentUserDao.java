@@ -60,23 +60,73 @@ public class IndependentUserDao {
 	}
 
 	public void deleteAll() throws SQLException, ClassNotFoundException {
-		Connection c = connectionMaker.makeNewConnection();
-		PreparedStatement ps = c.prepareStatement ("delete from users");
-		ps.executeUpdate();
-		ps.close();
-		c.close();
+
+		Connection c = null;
+		PreparedStatement ps = null;
+
+		try {
+			c = connectionMaker.makeNewConnection();
+			ps = c.prepareStatement ("delete from users");
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			if (ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (c != null) {
+			try {
+				c.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		}
+		
 	}
 
 	public int getCount() throws ClassNotFoundException, SQLException {
 		Connection c = connectionMaker.makeNewConnection();
-		PreparedStatement ps = c.prepareStatement("select count(*) from users");
-		ResultSet rs = ps.executeQuery();
-		rs.next();
-		int count = rs.getInt(1);
-		rs.close();
-		ps.close();
-		c.close();
+		ResultSet rs = null;
+		
+		PreparedStatement ps = null;
 
-		return count;
+		try {
+			c = connectionMaker.makeNewConnection();
+
+			ps = c.prepareStatement("select count(*) from users");
+			rs = ps.executeQuery();
+			rs.next();
+			return rs.getInt(1);
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (c != null) {
+				try {
+					c.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
 	}
 }
