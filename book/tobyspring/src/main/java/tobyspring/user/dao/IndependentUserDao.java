@@ -90,6 +90,35 @@ public class IndependentUserDao {
 		}
 		
 	}
+
+	public void jdbcContextStatementStrategy(StatementStrategy stmt) throws SQLException, ClassNotFoundException {
+		Connection c = null;
+		PreparedStatement ps = null;
+
+		try {
+			c = connectionMaker.makeNewConnection();
+
+			ps = stmt.makePreparedStatement(c);
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			if (ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (c != null) {
+				try {
+					c.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 	public int getCount() throws ClassNotFoundException, SQLException {
 		Connection c = connectionMaker.makeNewConnection();
 		ResultSet rs = null;
