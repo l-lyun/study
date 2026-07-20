@@ -10,7 +10,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 
 import tobyspring.user.domain.User;
 
-abstract public class IndependentUserDao {
+public class IndependentUserDao {
 
 	private final ConnectionMaker connectionMaker;
 
@@ -66,7 +66,9 @@ abstract public class IndependentUserDao {
 
 		try {
 			c = connectionMaker.makeNewConnection();
-			ps = makeStatement(c);
+			StatementStrategy strategy = new DeleteAllStatement();
+			
+			ps = strategy.makePreparedStatement(c);
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			throw e;
@@ -88,9 +90,6 @@ abstract public class IndependentUserDao {
 		}
 		
 	}
-
-	abstract protected PreparedStatement makeStatement(Connection c)throws SQLException;
-
 	public int getCount() throws ClassNotFoundException, SQLException {
 		Connection c = connectionMaker.makeNewConnection();
 		ResultSet rs = null;
