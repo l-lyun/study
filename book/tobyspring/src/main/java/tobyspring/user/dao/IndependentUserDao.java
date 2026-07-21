@@ -12,16 +12,18 @@ import tobyspring.user.domain.User;
 
 public class IndependentUserDao {
 
-	private final ConnectionMaker connectionMaker;
+	private ConnectionMaker connectionMaker;
+	private JdbcContext jdbcContext;
 
-	public IndependentUserDao(ConnectionMaker connectionMaker) {
+	public IndependentUserDao(JdbcContext jdbcContext, ConnectionMaker connectionMaker) {
+		this.jdbcContext = jdbcContext;
 		this.connectionMaker = connectionMaker;
 	}
 
 	public void add(User user) throws ClassNotFoundException, SQLException {
 
-		StatementStrategy st = new StatementStrategy() {
-				public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+		this.jdbcContext.workWithStatementStrategy(new StatementStrategy() {
+			public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
 				PreparedStatement ps = c.prepareStatement(
 					"insert into users(id, name, password) values (?, ?, ?)"
 				);
@@ -30,8 +32,21 @@ public class IndependentUserDao {
 				ps.setString(3, user.getPassword());
 				return ps;
 			}
-		};
-		jdbcContextStatementStrategy(st);
+		});
+	}
+
+	
+	public void deleteAll() throws SQLException, ClassNotFoundException {
+
+		// 선점한 전략 클래스의 오브젝트 생성
+		this.jdbcContext.workWithStatementStrategy(new StatementStrategy() {
+			public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+				PreparedStatement ps = c.prepareStatement("delete from users");
+				return ps;
+			}
+		});
+
+		
 	}
 
 	public User get(String id) throws ClassNotFoundException, SQLException {
@@ -58,22 +73,6 @@ public class IndependentUserDao {
 			throw new EmptyResultDataAccessException(1);
 
 		return user;
-	}
-
-	public void deleteAll() throws SQLException, ClassNotFoundException {
-
-
-
-		// 선점한 전략 클래스의 오브젝트 생성
-		StatementStrategy strategy =   new StatementStrategy() {
-			public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-				PreparedStatement ps = c.prepareStatement("delete from users");
-				return ps;
-			}
-		};
-		// 컨텍스트 호출. 전략 오브젝트 전달
-		jdbcContextStatementStrategy(strategy);
-		
 	}
 
 	public void jdbcContextStatementStrategy(StatementStrategy stmt) throws SQLException, ClassNotFoundException {
