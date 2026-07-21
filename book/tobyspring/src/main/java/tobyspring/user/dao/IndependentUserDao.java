@@ -20,11 +20,8 @@ public class IndependentUserDao {
 
 	public void add(User user) throws ClassNotFoundException, SQLException {
 
-		// 로컬 클래스로 이관
-		class AddStatement implements StatementStrategy {
-
-			@Override
-			public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+		StatementStrategy st = new StatementStrategy() {
+				public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
 				PreparedStatement ps = c.prepareStatement(
 					"insert into users(id, name, password) values (?, ?, ?)"
 				);
@@ -33,10 +30,8 @@ public class IndependentUserDao {
 				ps.setString(3, user.getPassword());
 				return ps;
 			}
-		}
-
-		StatementStrategy strategy = new AddStatement();
-		jdbcContextStatementStrategy(strategy);
+		};
+		jdbcContextStatementStrategy(st);
 	}
 
 	public User get(String id) throws ClassNotFoundException, SQLException {
@@ -67,8 +62,15 @@ public class IndependentUserDao {
 
 	public void deleteAll() throws SQLException, ClassNotFoundException {
 
+
+
 		// 선점한 전략 클래스의 오브젝트 생성
-		StatementStrategy strategy = new DeleteAllStatement();
+		StatementStrategy strategy =   new StatementStrategy() {
+			public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+				PreparedStatement ps = c.prepareStatement("delete from users");
+				return ps;
+			}
+		};
 		// 컨텍스트 호출. 전략 오브젝트 전달
 		jdbcContextStatementStrategy(strategy);
 		
