@@ -19,7 +19,23 @@ public class IndependentUserDao {
 	}
 
 	public void add(User user) throws ClassNotFoundException, SQLException {
-		StatementStrategy strategy = new AddStatement(user);
+
+		// 로컬 클래스로 이관
+		class AddStatement implements StatementStrategy {
+
+			@Override
+			public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+				PreparedStatement ps = c.prepareStatement(
+					"insert into users(id, name, password) values (?, ?, ?)"
+				);
+				ps.setString(1, user.getId());
+				ps.setString(2, user.getName());
+				ps.setString(3, user.getPassword());
+				return ps;
+			}
+		}
+
+		StatementStrategy strategy = new AddStatement();
 		jdbcContextStatementStrategy(strategy);
 	}
 
