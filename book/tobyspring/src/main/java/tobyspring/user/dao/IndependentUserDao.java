@@ -61,33 +61,10 @@ public class IndependentUserDao {
 
 	public void deleteAll() throws SQLException, ClassNotFoundException {
 
-		Connection c = null;
-		PreparedStatement ps = null;
-
-		try {
-			c = connectionMaker.makeNewConnection();
-			StatementStrategy strategy = new DeleteAllStatement();
-			
-			ps = strategy.makePreparedStatement(c);
-			ps.executeUpdate();
-		} catch (SQLException e) {
-			throw e;
-		} finally {
-			if (ps != null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if (c != null) {
-			try {
-				c.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		}
+		// 선점한 전략 클래스의 오브젝트 생성
+		StatementStrategy strategy = new DeleteAllStatement();
+		// 컨텍스트 호출. 전략 오브젝트 전달
+		jdbcContextStatementStrategy(strategy);
 		
 	}
 
