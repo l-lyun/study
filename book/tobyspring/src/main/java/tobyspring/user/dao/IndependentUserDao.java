@@ -36,17 +36,16 @@ public class IndependentUserDao {
 	}
 
 	
-	public void deleteAll() throws SQLException, ClassNotFoundException {
+		public void deleteAll() throws SQLException {
+			executeSql("delete from users");
+		}
 
-		// 선점한 전략 클래스의 오브젝트 생성
+	private void executeSql(final String query) throws SQLException {
 		this.jdbcContext.workWithStatementStrategy(new StatementStrategy() {
 			public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-				PreparedStatement ps = c.prepareStatement("delete from users");
-				return ps;
+				return c.prepareStatement(query);
 			}
 		});
-
-		
 	}
 
 	public User get(String id) throws ClassNotFoundException, SQLException {
