@@ -37,16 +37,9 @@ public class IndependentUserDao {
 
 	
 		public void deleteAll() throws SQLException {
-			executeSql("delete from users");
+			this.jdbcContext.executeSql("delete from users");
 		}
 
-	private void executeSql(final String query) throws SQLException {
-		this.jdbcContext.workWithStatementStrategy(new StatementStrategy() {
-			public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-				return c.prepareStatement(query);
-			}
-		});
-	}
 
 	public User get(String id) throws ClassNotFoundException, SQLException {
 		Connection c = connectionMaker.makeNewConnection();
